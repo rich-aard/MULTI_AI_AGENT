@@ -1,9 +1,37 @@
-.venv
-__pycache__
-*.pyc
-*.pyo
-.git
-.gitignore
+# Secrets — never in image
 .env
-.vscode
-.idea
+.env.*
+
+# Python cache
+__pycache__/
+*.py[oc]
+*.egg-info/
+.eggs/
+
+# Virtual environment
+.venv/
+
+# Dev/test artefacts
+tests/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+
+# CI
+.github/
+
+# Logs
+logs/
+
+# Docs
+README.md
+*.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# uv
+uv.lock
