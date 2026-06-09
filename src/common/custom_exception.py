@@ -1,7 +1,6 @@
 import sys
 import traceback
 from types import TracebackType
-from typing import Optional
 
 
 class CustomException(Exception):
@@ -13,7 +12,7 @@ class CustomException(Exception):
     def __init__(
         self,
         message: str,
-        original_error: Optional[Exception] = None,
+        original_error: Exception | None = None,
     ) -> None:
         _, _, exc_tb = sys.exc_info()
         self.original_error = original_error
@@ -25,20 +24,18 @@ class CustomException(Exception):
     @staticmethod
     def _format_message(
         message: str,
-        original_error: Optional[Exception],
-        exc_tb: Optional[TracebackType],
+        original_error: Exception | None,
+        exc_tb: TracebackType | None,
     ) -> str:
         file_name = exc_tb.tb_frame.f_code.co_filename if exc_tb else "unknown file"
         line_number = str(exc_tb.tb_lineno) if exc_tb else "unknown line"
-        error_detail = f" | Caused by: {type(original_error).__name__}: {original_error}" \
-            if original_error else ""
-
-        return (
-            f"{message}"
-            f"{error_detail}"
-            f" | File: {file_name}"
-            f" | Line: {line_number}"
+        error_detail = (
+            f" | Caused by: {type(original_error).__name__}: {original_error}"
+            if original_error
+            else ""
         )
+
+        return f"{message}{error_detail} | File: {file_name} | Line: {line_number}"
 
     def log(self, logger) -> None:
         logger.error(

@@ -1,9 +1,9 @@
-import streamlit as st
 import requests
+import streamlit as st
 
-from src.config.config import configs
-from src.common.logger import get_logger
 from src.common.custom_exception import CustomException
+from src.common.logger import get_logger
+from src.config.config import configs
 
 logger = get_logger(__name__)
 

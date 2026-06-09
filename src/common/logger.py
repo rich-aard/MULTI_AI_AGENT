@@ -11,6 +11,7 @@ DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 # Cache of already-configured loggers to avoid redundant setup
 _configured_loggers: set[str] = set()
 
+
 def _get_log_level() -> int:
     """Reads LOG_LEVEL from environment, defaults to INFO."""
     level_str = os.getenv("LOG_LEVEL", "INFO").upper()
