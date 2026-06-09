@@ -18,5 +18,4 @@ ENV PYTHONPATH=/app
 
 EXPOSE 8000 8501
 
-# Run both backend and frontend
-CMD ["python", "src/main.py"]
+CMD ["uvicorn", "src.backend.api:app", "--host", "0.0.0.0", "--port", "8000"]

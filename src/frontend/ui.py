@@ -7,8 +7,9 @@ from src.config.config import configs
 
 logger = get_logger(__name__)
 
-API_URL = "http://127.0.0.1:8000/chat"  # for fastAPI
+API_URL = st.secrets.get("API_URL", "http://127.0.0.1:8000") + "/chat"
 
+#page config
 st.set_page_config(page_title="Multi Agent", layout="wide")
 st.title("Multi Agent AI")
 st.caption("Powered by Groq · Tavily · FastAPI")
