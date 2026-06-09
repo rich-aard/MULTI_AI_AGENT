@@ -5,17 +5,17 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 COPY pyproject.toml uv.lock ./
 
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --system
 
-COPY . .
+COPY src/ ./src/
 
 ENV PYTHONPATH=/app
 
 EXPOSE 8000 8501
 
 # Run both backend and frontend
-CMD ["uv", "run", "python", "src/main.py"]
+CMD ["python", "src/main.py"]
