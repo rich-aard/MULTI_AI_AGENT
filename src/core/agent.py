@@ -1,6 +1,8 @@
-from langchain.agents import create_agent
+import asyncio
+from langchain_groq import ChatGroq
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_core.messages import AIMessage
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
+
 from src.config.config import configs
 from src.common.logger import get_logger
 from src.common.custom_exception import CustomException
@@ -15,18 +17,15 @@ async def get_ai_response(
     system_prompt: str = "You are a helpful assistant.",
 ) -> str:
     """
-    Invokes a ReAct agent and returns the final AI response.
-
-    Args:
-        query:            The user's input message.
-        model:            Groq model string to use.
-        allow_web_search: Whether to equip the agent with Tavily search.
-        system_prompt:    System-level instruction for the agent.
-
-    Returns:
-        The last AIMessage content string.
+    Invokes an LLM with optional tool use and returns the final response. Uses a manual tool loop to avoid create_agent formatting issues with Groq.
     """
     try:
+        llm = ChatGroq(
+            model=model,
+            api_key=configs.GROQ_API_KEY,
+            temperature=0,
+        )
+
         tools = (
             [
                 TavilySearchResults(
@@ -38,31 +37,47 @@ async def get_ai_response(
             else []
         )
 
-        agent = create_agent(
-            model=f"groq:{model}",
-            tools=tools,
-            system_prompt=system_prompt,
-        )
+        runnable = llm.bind_tools(tools) if tools else llm
 
-        logger.info(
-            "Invoking agent | model=%s | web_search=%s", model, allow_web_search
-        )
-
-        response = await agent.ainvoke(
-            {"messages": [{"role": "user", "content": query}]}
-        )
-
-        ai_messages = [
-            msg.content
-            for msg in response.get("messages", [])
-            if isinstance(msg, AIMessage)
+        messages = [
+            SystemMessage(content=system_prompt),
+            HumanMessage(content=query),
         ]
 
-        if not ai_messages:
-            raise CustomException("Agent returned no AIMessage in response.")
+        logger.info("Invoking LLM | model=%s | web_search=%s", model, allow_web_search)
 
-        logger.info("Agent response received successfully.")
-        return ai_messages[-1]
+        while True:
+            response = await asyncio.get_event_loop().run_in_executor(
+                None, runnable.invoke, messages
+            )
+
+            if not response.tool_calls:
+                break
+
+            messages.append(response)
+            for tool_call in response.tool_calls:
+                tool = next((t for t in tools if t.name == tool_call["name"]), None)
+                if tool is None:
+                    tool_result = f"Tool '{tool_call['name']}' not found."
+                else:
+                    tool_result = await asyncio.get_event_loop().run_in_executor(
+                        None, tool.invoke, tool_call["args"]
+                    )
+                messages.append(
+                    ToolMessage(
+                        content=str(tool_result),
+                        tool_call_id=tool_call["id"],
+                    )
+                )
+
+        if not response.content:
+            raise CustomException("LLM returned an empty response.")
+
+        logger.info("Response received successfully.")
+        return response.content
+
+    except CustomException:
+        raise
 
     except Exception as e:
         raise CustomException("Agent invocation failed.", original_error=e) from e

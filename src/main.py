@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 BACKEND_URL = "http://127.0.0.1:8000/health"
 BACKEND_STARTUP_TIMEOUT = 15
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = os.environ.copy()
 env["PYTHONPATH"] = PROJECT_ROOT
 
@@ -47,6 +47,7 @@ def init_backend(error_event: threading.Event) -> None:
         subprocess.run(
             ["uvicorn", "src.backend.api:app", "--host", "127.0.0.1", "--port", "8000"],
             check=True,
+            env=env,
         )
     except subprocess.CalledProcessError as e:
         logger.error("Backend process exited with error: %s", str(e))
@@ -60,7 +61,7 @@ def init_frontend() -> None:
     """Starts the Streamlit frontend."""
     try:
         logger.info("Initializing frontend...")
-        subprocess.run(["streamlit", "run", "src/frontend/ui.py"], check=True)
+        subprocess.run(["streamlit", "run", "src/frontend/ui.py"], check=True, env=env)
     except subprocess.CalledProcessError as e:
         raise CustomException("Frontend process failed.", original_error=e) from e
     except Exception as e:
