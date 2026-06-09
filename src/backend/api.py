@@ -68,8 +68,8 @@ async def chat_endpoint(request: RequestState) -> ChatResponse:
 
     except CustomException as e:
         logger.error("Exception during response generation: %s", str(e))
-        raise HTTPException(status_code=500, detail=str(e) )
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
     except Exception as e:
         logger.error("Unexpected error during response generation: %s", str(e))
-        raise HTTPException(status_code=500, detail="Internal server error.")
+        raise HTTPException(status_code=500, detail="Internal server error.") from e

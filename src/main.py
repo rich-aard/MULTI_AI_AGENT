@@ -94,4 +94,4 @@ if __name__ == "__main__":
         init_frontend()
     except CustomException as e:
         logger.error("Frontend failed: %s", str(e))
-        raise SystemExit(1)
+        raise SystemExit(1) from e
