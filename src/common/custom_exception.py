@@ -4,9 +4,14 @@ from types import TracebackType
 
 
 class CustomException(Exception):
-    """
-    Structured exception for the Multi-Agent RAG system.
-    Captures the error message, originating file, line number, and full traceback at the point of raising. Works correctly both inside and outside except blocks.
+    """Custom exception for application-specific errors.
+
+    Wraps original exceptions with additional context and custom messaging.
+
+    Attributes:
+        message: Human-readable error message.
+        original_error: The underlying exception that caused this error.
+
     """
 
     def __init__(

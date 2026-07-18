@@ -40,7 +40,13 @@ def wait_for_backend(timeout: int = BACKEND_STARTUP_TIMEOUT) -> bool:
 
 
 def init_backend(error_event: threading.Event) -> None:
-    """Starts the FastAPI backend via uvicorn. Sets error_event on failure."""
+    """Start FastAPI backend via uvicorn in a thread.
+
+    Sets error_event flag if startup fails.
+
+    Args:
+        error_event: Threading event to signal errors.
+    """
 
     try:
         logger.info("Initializing backend...")

@@ -27,8 +27,14 @@ with st.sidebar:
         "System prompt",
         value="You are a helpful assistant.",
         height=120,
-        help="Sets the behaviour/role of the AI agent.",
+        help="Customize the AI's role and behavior",
     )
+
+    with st.expander("Example prompts"):
+        st.code("""You are a Python expert.
+    You are a mathematics tutor.
+    You are a creative writer.
+    You are a business consultant.""")
 
     if st.button("Clear chat", use_container_width=True):
         st.session_state.chat_history = []
@@ -46,11 +52,17 @@ if user_query and user_query.strip():
     with st.chat_message("user"):
         st.markdown(user_query)
 
+    history_messages = [
+        msg["content"] for msg in st.session_state.chat_history if msg["role"] == "user"
+    ]
+
+    all_messages = history_messages + [user_query]
+
     payload = {
         "model": model,
         "system_prompt": system_prompt or "You are a helpful assistant.",
         "allow_web_search": allow_web_search,
-        "messages": [user_query],
+        "messages": all_messages,
     }
 
     with st.chat_message("assistant"):

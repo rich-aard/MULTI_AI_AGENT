@@ -17,8 +17,23 @@ async def get_ai_response(
     allow_web_search: bool = False,
     system_prompt: str = "You are a helpful assistant.",
 ) -> str:
-    """
-    Invokes an LLM with optional tool use and returns the final response. Uses a manual tool loop to avoid create_agent formatting issues with Groq.
+    """Invoke LLM with optional tool use (web search).
+
+    Implements a manual tool loop to handle agent reasoning steps.
+    Supports iterative tool calling until LLM returns a final response.
+
+    Args:
+        query: User query string.
+        model: Groq model ID from GROQ_LLM_MODELS list.
+        allow_web_search: Enable Tavily web search tool. If True, LLM can invoke search.
+        system_prompt: System message to guide LLM behavior and role.
+
+    Returns:
+        LLM response content string.
+
+    Raises:
+        CustomException: If LLM invocation fails, returns empty response, or tool fails.
+
     """
     try:
         llm = ChatGroq(

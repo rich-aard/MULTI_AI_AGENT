@@ -58,7 +58,7 @@ def test_chat_endpoint_rejects_invalid_model(client):
 def test_chat_endpoint_rejects_empty_messages(client):
     payload = {
         "model": "llama-3.3-70b-versatile",
-        "system_prompt": "You are helpful.",
+        "system_prompt": "You are a helpful.",
         "messages": [],
         "allow_web_search": False,
     }
