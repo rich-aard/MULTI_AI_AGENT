@@ -2,6 +2,11 @@
 
 A production-grade LLM agent system with Groq inference, optional web search via Tavily, and a FastAPI backend + Streamlit frontend.
 
+## Demo
+- **API**: [https://multi-ai-agent-wc6v.onrender.com/docs] (Swagger UI)
+
+- **Frontend**: [https://multi-ai-agent-21.streamlit.app/]
+
 ## Architecture
 - **Backend**: FastAPI + async LangChain agents + Groq LLM + Tavily search
 - **Frontend**: Streamlit with chat history
